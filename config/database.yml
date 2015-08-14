@@ -1,0 +1,6 @@
+development: &default
+  adapter: mysql2
+  host: mysql
+  username: root
+  password:
+  database: amz_bestsellers_bot_development

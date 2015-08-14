@@ -1,0 +1,14 @@
+redis:
+  image: redis:3
+mysql:
+  image: mysql:5.6
+  environment:
+    MYSQL_ALLOW_EMPTY_PASSWORD: yes
+app:
+  build: .
+  command: bundle exec ruby pof.rb
+  volumes:
+    - .:/usr/src/amz-bestsellers-bot
+  links:
+    - redis
+    - mysql
