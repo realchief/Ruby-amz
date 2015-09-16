@@ -12,3 +12,5 @@ app:
   links:
     - redis
     - mysql
+  environment:
+    REDIS_URL: redis://redis/10
