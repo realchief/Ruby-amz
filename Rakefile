@@ -17,3 +17,4 @@ task :environment do
 end
 
 load 'active_record/railties/databases.rake'
+load 'lib/tasks/sidekiq/create_jobs.rake'
