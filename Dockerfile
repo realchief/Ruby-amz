@@ -1,13 +1,17 @@
 FROM ruby:2.2.2-slim
 
-RUN apt-get update -qq && apt-get install --no-install-recommends -y gcc make libmysqlclient-dev
+RUN apt-get update -qq && apt-get install --no-install-recommends -y \
+  gcc                \
+  make               \
+  libmysqlclient-dev
 
-RUN mkdir /usr/src/amz-bestsellers-bot
-WORKDIR /usr/src/amz-bestsellers-bot
-ADD Gemfile /usr/src/amz-bestsellers-bot/Gemfile
-ADD Gemfile.lock /usr/src/amz-bestsellers-bot/Gemfile.lock
-RUN bundle install
-ADD . /usr/src/amz-bestsellers-bot
+RUN mkdir -p /app
+WORKDIR /app
+
+COPY Gemfile Gemfile.lock ./
+RUN gem install bundler && bundle install --jobs 20 --retry 5
+
+COPY . ./
 
 EXPOSE 3000
 

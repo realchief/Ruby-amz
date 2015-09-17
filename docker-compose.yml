@@ -7,10 +7,10 @@ mysql:
 app:
   build: .
   volumes:
-    - .:/usr/src/amz-bestsellers-bot
+    - .:/app
   links:
     - redis
     - mysql
   environment:
-    DATABASE_URL: mysql2://mysql/amz_bestsellers_bot_development
+    DATABASE_URL: mysql2://mysql/amz_bestsellers_development
     REDIS_URL: redis://redis/10
