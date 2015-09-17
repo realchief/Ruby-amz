@@ -1,5 +1,4 @@
 require 'sidekiq'
-require 'yaml'
 require 'logger'
 require 'active_record'
 require_relative 'probe'
@@ -8,12 +7,8 @@ require_relative 'parser'
 LOG = Logger.new(STDOUT)
 LOG.datetime_format = "%Y-%m-%d %H:%M:%S"
 
-cfg_dir = File.expand_path('../../../config', __FILE__)
-db_cfg  = YAML.load(File.read(File.join(cfg_dir, 'database.yml')))
-
 ActiveRecord::Base.raise_in_transactional_callbacks = true
-ActiveRecord::Base.configurations = db_cfg
-ActiveRecord::Base.establish_connection(:development)
+ActiveRecord::Base.establish_connection
 
 require_relative 'best_seller'
 

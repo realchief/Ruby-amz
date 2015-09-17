@@ -6,11 +6,11 @@ mysql:
     MYSQL_ALLOW_EMPTY_PASSWORD: yes
 app:
   build: .
-  command: bundle exec ruby pof.rb
   volumes:
     - .:/usr/src/amz-bestsellers-bot
   links:
     - redis
     - mysql
   environment:
+    DATABASE_URL: mysql2://mysql/amz_bestsellers_bot_development
     REDIS_URL: redis://redis/10
