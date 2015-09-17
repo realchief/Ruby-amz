@@ -12,7 +12,7 @@ ActiveRecord::Base.establish_connection
 
 require_relative 'best_seller'
 
-module AMZBestSellersBot
+module AMZBestSellers
   class Worker
 
     include Sidekiq::Worker

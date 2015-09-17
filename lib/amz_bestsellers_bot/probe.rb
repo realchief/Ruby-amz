@@ -1,12 +1,12 @@
 require 'excon'
 
-module AMZBestSellersBot
+module AMZBestSellers
   class Probe
 
     def initialize
       @bot = Excon.new('http://www.amazon.com',
-        middlewares:  Excon.defaults[:middlewares] +
-                   [Excon::Middleware::RedirectFollower],
+        middlewares: Excon.defaults[:middlewares] +
+                     [Excon::Middleware::RedirectFollower],
         persistent:  true,
         debug:       false
       )
