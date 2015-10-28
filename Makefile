@@ -1,10 +1,10 @@
 default: build
 
 build:
-	docker build -t mksm/amz_products .
+	docker build -t mksm/amz_bestsellers .
 
 push:
-	docker push mksm/amz_products
+	docker push mksm/amz_bestsellers
 
 package:
 	zip -r tmp/release.zip .ebextensions/ .elasticbeanstalk/ Dockerrun.aws.json
