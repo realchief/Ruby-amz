@@ -1,12 +1,12 @@
-FROM ruby:2.2.2-slim
+FROM ruby:2.2.3-slim
 
 RUN apt-get update -qq && apt-get install --no-install-recommends -y \
   gcc                \
   make               \
   libmysqlclient-dev
 
-RUN mkdir -p /app
-WORKDIR /app
+RUN mkdir -p /usr/src/app
+WORKDIR /usr/src/app
 
 COPY Gemfile Gemfile.lock ./
 RUN gem install bundler && bundle install --jobs 20 --retry 5
