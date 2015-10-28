@@ -1,6 +1,6 @@
 desc "Create and push jobs to Sidekiq's server"
 namespace :sidekiq do
-  task create_jobs: :environment do
+  task create_bestsellers_jobs: :environment do
     require 'sidekiq'
 
     categories_with_limits = [
@@ -28,5 +28,21 @@ namespace :sidekiq do
       'args'  => categories_with_limits,
       'retry' => false
     )
+  end
+
+  task create_products_jobs: :environment do
+    require 'sidekiq'
+    require_relative '../../amz_bestsellers_bot/best_seller'
+
+    BestSeller.find_in_batches(batch_size: 1000) do |pack|
+      pack.each_slice(10) do |minipack|
+        Sidekiq::Client.push(
+          'queue' => 'amz_products_green',
+          'class' => 'AMZProducts::Worker',
+          'args'  => minipack.map { |bs| bs.asin },
+          'retry' => false
+        )
+      end
+    end
   end
 end
