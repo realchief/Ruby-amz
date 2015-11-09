@@ -1,6 +1,7 @@
 FROM ruby:2.2.3-slim
 
 RUN apt-get update -qq && apt-get install --no-install-recommends -y \
+  g++                \
   gcc                \
   make               \
   libmysqlclient-dev
