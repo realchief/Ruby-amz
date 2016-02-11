@@ -8,8 +8,8 @@ module AMZBestSellers
 
     Thread.new do
       loop do
-        @@permits << 1 if @@permits.size < 30
-        sleep(2)
+        @@permits << true if @@permits.empty?
+        sleep(1)
       end
     end
 
@@ -36,10 +36,20 @@ module AMZBestSellers
       @@permits.shift
       res = @bot.get(path: "/s?#{build_query_params(category, page)}")
 
-      @jar.parse(res.headers['Set-Cookie'], @url)
+      @jar.parse(res.headers['Set-Cookie'], @url) if res.headers['Set-Cookie']
       @headers['Cookie'] = HTTP::Cookie.cookie_value(@jar.cookies)
 
+      res.body = res.body.gsub("\n", ' ')
+      res.body = res.body.squeeze(' ')
+
+      if res.body =~ /we just need to make sure you're not a robot/i
+        raise RuntimeError, 'Captcha detected'
+      end
+
       res
+    rescue RuntimeError
+      sleep(0.5)
+      retry
     end
 
     private
