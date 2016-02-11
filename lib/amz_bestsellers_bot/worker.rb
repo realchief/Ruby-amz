@@ -27,10 +27,8 @@ module AMZBestSellers
 
       while collected_results.size < max_results.to_i do
         res = @probe.query(category, page += 1)
-        LOG.info "Fetched page #{page}"
 
-        captcha_page = !!(res.body =~ /Type the characters you see in this image/i)
-        LOG.info "Fetched captcha page: #{captcha_page}"
+        LOG.info "Fetched page #{page}"
 
         results = Parser.parse_asins(res.body)
         LOG.info "Scraped #{results.size} products"
@@ -39,11 +37,15 @@ module AMZBestSellers
         LOG.info "Collected results: #{collected_results.size}"
       end
 
-      collected_results.each_with_index do |asin, pos|
-        bs = BestSeller.find_or_initialize_by(asin: asin, category_id: category)
-        bs.position   = pos + 1
-        bs.updated_at = DateTime.now
-        bs.save
+      BestSeller.transaction do
+        BestSeller.where(category_id: category).delete_all
+
+        collected_results.each_with_index do |asin, pos|
+          BestSeller.create!(
+            asin:     asin,    category_id: category,
+            position: pos + 1, created_at:  DateTime.now
+          )
+        end
       end
     end
   end
