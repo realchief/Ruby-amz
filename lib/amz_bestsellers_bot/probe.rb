@@ -4,15 +4,6 @@ require 'http-cookie'
 module AMZBestSellers
   class Probe
 
-    @@permits = Queue.new
-
-    Thread.new do
-      loop do
-        @@permits << true if @@permits.empty?
-        sleep(1)
-      end
-    end
-
     DEFAULT_HEADERS = {
       'Accept'     => 'text/html',
       'User-Agent' => 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.80 Safari/537.36'
@@ -33,7 +24,6 @@ module AMZBestSellers
     end
 
     def query(category, page)
-      @@permits.shift
       res = @bot.get(path: "/s?#{build_query_params(category, page)}")
 
       @jar.parse(res.headers['Set-Cookie'], @url) if res.headers['Set-Cookie']
@@ -48,7 +38,7 @@ module AMZBestSellers
 
       res
     rescue RuntimeError
-      sleep(0.5)
+      sleep(2)
       retry
     end
 
