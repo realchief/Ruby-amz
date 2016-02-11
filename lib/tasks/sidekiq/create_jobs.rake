@@ -10,17 +10,22 @@ namespace :sidekiq do
       [3760911   ,  9000], # Beauty
       [502394    ,  4000], # Camera & Photo
       [7141123011,  4000], # Clothes, Shoes & Jewelry
+      [16310101  ,  7000], # Grocery & Gourmet Food
       [3760901   , 14000], # Health & Personal Care
       [1055398   , 16000], # Home & Kitchen
-      [16310091  ,  1100], # Industrial & Scientific
-      [284507    ,  6800], # Kitchen & Dining
+      [16310091  ,  2000], # Industrial & Scientific
+      [284507    ,  7500], # Kitchen & Dining
       [11091801  ,  4000], # Musical Instruments
       [1064954   ,  4500], # Office Products
       [2619533011,  3500], # Pet Supplies
       [3375251   ,  8000], # Sports & Outdoors
-      [228013    ,  4000], # Tools & Hardware
+      [228013    ,  6000], # Tools & Home Improvement
       [165793011 ,  6000]  # Toys and Games
     ]
+
+    categories_with_limits.map! do |node_id, limit|
+      [node_id, limit * 1.5]
+    end
 
     Sidekiq::Client.push_bulk(
       'queue' => 'amz_bestsellers_green',
@@ -46,3 +51,4 @@ namespace :sidekiq do
     end
   end
 end
+#'Arts, Crafts & Sewing', 'Automotive', 'Baby', 'Beauty', 'Camera & Photo', 'Clothes, Shoes & Jewelry', 'Health & Personal Care', 'Home & Kitchen', 'Industrial & Scientific', 'Kitchen & Dining', 'Musical Instruments', 'Office Products', 'Pet Supplies', 'Sports & Outdoors', 'Tools & Hardware', 'Toys and Games'
