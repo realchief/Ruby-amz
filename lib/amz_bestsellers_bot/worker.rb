@@ -8,6 +8,7 @@ LOG = Logger.new(STDOUT)
 LOG.datetime_format = "%Y-%m-%d %H:%M:%S"
 
 ActiveRecord::Base.raise_in_transactional_callbacks = true
+ActiveRecord::Base.logger = LOG
 ActiveRecord::Base.establish_connection
 
 require_relative 'models/best_seller'
