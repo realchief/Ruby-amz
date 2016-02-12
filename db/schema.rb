@@ -11,13 +11,24 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 1) do
+ActiveRecord::Schema.define(version: 2) do
 
   create_table "best_sellers", force: :cascade do |t|
-    t.string   "asin",        limit: 10
-    t.integer  "category_id", limit: 8
-    t.integer  "position",    limit: 2
-    t.datetime "created_at",             null: false
+    t.integer  "browse_node_id", limit: 8
+    t.integer  "rank",           limit: 2
+    t.string   "asin",           limit: 10
+    t.string   "slug",           limit: 255
+    t.decimal  "rating",                     precision: 4, scale: 2
+    t.integer  "review_count",   limit: 3
+    t.datetime "created_at"
+  end
+
+  create_table "browse_nodes", force: :cascade do |t|
+    t.string   "path",              limit: 255
+    t.string   "query",             limit: 255
+    t.integer  "is_deepest",        limit: 1
+    t.string   "best_sellers_path", limit: 255
+    t.datetime "updated_at"
   end
 
 end
