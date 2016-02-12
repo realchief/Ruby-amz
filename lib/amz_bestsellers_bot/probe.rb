@@ -40,6 +40,24 @@ module AMZBestSellers
       @http_bot.get "/Best-Sellers/zgbs/apparel/#{node_id}"
     end
 
+    def fetch_all_best_sellers_via_ajax(uri_path)
+      1.upto(5).inject('') do |mem, pg|
+        query_above_fold = { _encoding: 'UTF8', pg: pg, ajax: 1 }
+        query_below_fold = query_above_fold.merge(isAboveTheFold: 0)
+
+        res_above_fold = @http_bot.get(uri_path, query_above_fold)
+        res_below_fold = @http_bot.get(uri_path, query_below_fold)
+
+        res_body  = (res_above_fold.body << res_below_fold.body)
+        mem      << res_body.gsub("\n", ' ').squeeze(' ')
+
+        doc = Nokogiri::HTML::DocumentFragment.parse(res_body)
+        break mem if doc.css('div.zg_itemImmersion').size < 20
+
+        mem
+      end
+    end
+
     private
 
     def initialize_http_session
