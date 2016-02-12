@@ -3,8 +3,9 @@ FROM ruby:2.2.3-slim
 RUN apt-get update -qq && apt-get install --no-install-recommends -y \
   g++                \
   gcc                \
+  libmysqlclient-dev \
   make               \
-  libmysqlclient-dev
+  patch
 
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
