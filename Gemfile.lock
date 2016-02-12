@@ -136,7 +136,6 @@ DEPENDENCIES
   mysql2 (~> 0.3.10)
   nokogiri
   pry
-  roo
   roo-xls
   sidekiq (~> 3.5.0)
   vacuum

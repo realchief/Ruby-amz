@@ -1,56 +1,49 @@
-require 'excon'
-require 'http-cookie'
+require 'vacuum'
+require 'faraday'
+require 'faraday-cookie_jar'
 
 module AMZBestSellers
   class Probe
 
-    DEFAULT_HEADERS = {
-      'Accept'     => 'text/html',
-      'User-Agent' => 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.80 Safari/537.36'
-    }
+    @@permits = Queue.new
 
-    def initialize
-      @url     = 'http://www.amazon.com'
-      @headers = DEFAULT_HEADERS
-      @jar     = HTTP::CookieJar.new(store: :hash)
-
-      @bot = Excon.new(@url,
-        middlewares: Excon.defaults[:middlewares] +
-                     [Excon::Middleware::RedirectFollower],
-        headers:     @headers,
-        persistent:  true,
-        debug:       false
-      )
+    Thread.new do
+      loop do
+        @@permits << true if @@permits.empty?
+        sleep(1)
+      end
     end
 
-    def query(category, page)
-      res = @bot.get(path: "/s?#{build_query_params(category, page)}")
+    def initialize
+      @vacuum = Vacuum.new
+      @vacuum.configure(associate_tag: ENV['AMZ_ASSOCIATE_TAG'])
 
-      @jar.parse(res.headers['Set-Cookie'], @url) if res.headers['Set-Cookie']
-      @headers['Cookie'] = HTTP::Cookie.cookie_value(@jar.cookies)
-
-      res.body = res.body.gsub("\n", ' ')
-      res.body = res.body.squeeze(' ')
-
-      if res.body =~ /we just need to make sure you're not a robot/i
-        raise RuntimeError, 'Captcha detected'
+      @http_bot = Faraday.new(url: 'http://www.amazon.com') do |faraday|
+        faraday.use      :cookie_jar
+        faraday.response :logger                  # log requests to STDOUT
+        faraday.adapter  Faraday.default_adapter  # make requests with Net::HTTP
       end
 
-      res
-    rescue RuntimeError
-      sleep(2)
-      retry
+      initialize_http_session
+    end
+
+    def fetch_browse_node_details(node_id)
+      @@permits.shift
+
+      @vacuum.browse_node_lookup(
+        persistent: true,
+        query:      { 'BrowseNodeId' => node_id }
+      ).to_h
+    end
+
+    def fetch_browse_node_best_sellers_home(node_id)
+      @http_bot.get "/Best-Sellers/zgbs/apparel/#{node_id}"
     end
 
     private
 
-    def build_query_params(category, page)
-      [
-        "fields-keywords=-asdfqaz",
-        "node=#{category}",
-        "page=#{page}",
-        "sort=salesrank"
-      ] * '&'
+    def initialize_http_session
+      @http_bot.get '/Best-Seelers/zgbs'
     end
   end
 end
