@@ -19,22 +19,20 @@ module AMZBestSellers
 
     include Sidekiq::Worker
 
-    def initialize
-      @probe  = Probe.new
-      @parser = Parser
-    end
+    @@probe  = Probe.new
+    @@parser = Parser
 
     def perform(node_id)
       browse_node = BrowseNode.find_by(id: node_id)
 
-      bn_bs_body = @probe.fetch_all_best_sellers_via_ajax(
+      bn_bs_body = @@probe.fetch_all_best_sellers_via_ajax(
         browse_node.best_sellers_path
       )
 
       ActiveRecord::Base.transaction do
         BestSeller.where(browse_node_id: browse_node.id).delete_all
 
-        @parser.parse_best_sellers(bn_bs_body).each do |attrs|
+        @@parser.parse_best_sellers(bn_bs_body).each do |attrs|
           BestSeller.create!(attrs.merge(browse_node_id: browse_node.id))
         end
 
